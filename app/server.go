@@ -33,13 +33,39 @@ func main() {
 		os.Exit(1)
 	}
 	requestData := strings.Split(request, " ")
-	var output string
-	if requestData[1] != "/" {
-		output = "HTTP/1.1 404 Not Found\r\n\r\n"
-	} else {
-		output = "HTTP/1.1 200 OK\r\n\r\n"
+	var resp *Response
+	if len(requestData) < 2 {
+		resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
+		_, err = conn.Write([]byte(resp.String()))
+		if err != nil {
+			fmt.Println("Error writing response: ", err.Error())
+			os.Exit(1)
+		}
+		return
 	}
-	_, err = conn.Write([]byte(output))
+	path := strings.Split(requestData[1], "/")
+
+	switch len(path) {
+	case 0:
+		fmt.Println(path)
+		resp = NewResponse("HTTP/1.1", 200, "OK", nil, "")
+	case 2:
+		if path[0] == path[1] && path[0] == "" {
+			resp = NewResponse("HTTP/1.1", 200, "OK", nil, "")
+		} else {
+			resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
+		}
+	case 3:
+		if path[1] == "echo" {
+			resp = NewResponse("HTTP/1.1", 200, "OK", map[string]string{"Content-Type": "text/plain", "Content-Length": fmt.Sprintf("%d", len([]byte(path[2])))}, path[2])
+		} else {
+			resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
+		}
+	default:
+		resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
+	}
+
+	_, err = conn.Write([]byte(resp.String()))
 	defer conn.Close()
 	if err != nil {
 		fmt.Println("Error writing response: ", err.Error())
