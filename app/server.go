@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"net"
 	"os"
@@ -27,12 +26,15 @@ func main() {
 		fmt.Println("Error accepting connection: ", err.Error())
 		os.Exit(1)
 	}
-	request, err := bufio.NewReader(conn).ReadString('\n')
+	request := NewRequest(conn)
+	err = request.Parse()
 	if err != nil {
-		fmt.Println("Error reading request")
+		fmt.Printf("Error reading request = %s\n", err.Error())
 		os.Exit(1)
 	}
-	requestData := strings.Split(request, " ")
+	fmt.Println(request.headers)
+	fmt.Println(request.requestLine)
+	requestData := strings.Split(request.requestLine, " ")
 	var resp *Response
 	if len(requestData) < 2 {
 		resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
