@@ -7,6 +7,7 @@ import (
 )
 
 type Request struct {
+	// TODO: replace net.Conn by Reader interface
 	Conn        net.Conn
 	requestLine string
 	headers     []string
@@ -50,6 +51,7 @@ func (r *Request) Parse() error {
 		headers = append(headers, header)
 	}
 	r.body = body
+	// TODO: make header in form of map[string][]string
 	r.headers = headers
 	return nil
 }
