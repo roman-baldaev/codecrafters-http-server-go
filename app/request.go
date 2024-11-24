@@ -60,7 +60,7 @@ func (r *Request) Parse() error {
 		if len(splittedHeader) != 2 {
 			continue
 		}
-		r.headers[splittedHeader[0]] = splittedHeader[1]
+		r.headers[splittedHeader[0]] = strings.TrimRight(splittedHeader[1], "\r\n")
 	}
 	return nil
 }
