@@ -46,16 +46,19 @@ func main() {
 		return
 	}
 	path := strings.Split(requestData[1], "/")
-
 	switch len(path) {
 	case 0:
 		fmt.Println(path)
 		resp = NewResponse("HTTP/1.1", 200, "OK", nil, "")
+	case 1:
+		fmt.Println(path)
 	case 2:
 		if path[0] == path[1] && path[0] == "" {
 			resp = NewResponse("HTTP/1.1", 200, "OK", nil, "")
-		} else {
-			resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
+		}
+		if path[1] == "user-agent" {
+			val := request.headers["User-Agent"]
+			resp = NewResponse("HTTP/1.1", 200, "OK", map[string]string{"Content-Type": "text/plain", "Content-Length": fmt.Sprintf("%d", len([]byte(val)))}, val)
 		}
 	case 3:
 		if path[1] == "echo" {

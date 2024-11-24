@@ -4,19 +4,21 @@ import (
 	"bufio"
 	"io"
 	"net"
+	"strings"
 )
 
 type Request struct {
 	// TODO: replace net.Conn by Reader interface
 	Conn        net.Conn
 	requestLine string
-	headers     []string
+	headers     map[string]string
 	body        []byte
 }
 
 func NewRequest(conn net.Conn) *Request {
 	return &Request{
-		Conn: conn,
+		Conn:    conn,
+		headers: make(map[string]string),
 	}
 }
 
@@ -52,6 +54,13 @@ func (r *Request) Parse() error {
 	}
 	r.body = body
 	// TODO: make header in form of map[string][]string
-	r.headers = headers
+	var splittedHeader []string
+	for _, h := range headers {
+		splittedHeader = strings.SplitN(h, ": ", 2)
+		if len(splittedHeader) != 2 {
+			continue
+		}
+		r.headers[splittedHeader[0]] = splittedHeader[1]
+	}
 	return nil
 }
