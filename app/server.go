@@ -55,11 +55,14 @@ func main() {
 	case 2:
 		if path[0] == path[1] && path[0] == "" {
 			resp = NewResponse("HTTP/1.1", 200, "OK", nil, "")
+			break
 		}
 		if path[1] == "user-agent" {
 			val := request.headers["User-Agent"]
 			resp = NewResponse("HTTP/1.1", 200, "OK", map[string]string{"Content-Type": "text/plain", "Content-Length": fmt.Sprintf("%d", len([]byte(val)))}, val)
+			break
 		}
+		resp = NewResponse("HTTP/1.1", 404, "Not Found", nil, "")
 	case 3:
 		if path[1] == "echo" {
 			resp = NewResponse("HTTP/1.1", 200, "OK", map[string]string{"Content-Type": "text/plain", "Content-Length": fmt.Sprintf("%d", len([]byte(path[2])))}, path[2])
